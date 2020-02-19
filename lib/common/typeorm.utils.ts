@@ -29,12 +29,12 @@ export function getRepositoryToken(
     throw new CircularDependencyException('@InjectRepository()');
   }
   const connectionPrefix = getConnectionPrefix(connection);
-  if (
+  /*if (
     entity.prototype instanceof Repository ||
     entity.prototype instanceof AbstractRepository
   ) {
     return `${connectionPrefix}${getCustomRepositoryToken(entity)}`;
-  }
+  }*/
   return `${connectionPrefix}${entity.name}Repository`;
 }
 
