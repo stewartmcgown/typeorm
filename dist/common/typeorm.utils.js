@@ -4,7 +4,7 @@ const common_1 = require("@nestjs/common");
 const operators_1 = require("rxjs/operators");
 const typeorm_1 = require("typeorm");
 const util_1 = require("util");
-const uuid = require("uuid/v4");
+const uuid_1 = require("uuid");
 const circular_dependency_exception_1 = require("../exceptions/circular-dependency.exception");
 const typeorm_constants_1 = require("../typeorm.constants");
 const logger = new common_1.Logger('TypeOrmModule');
@@ -71,4 +71,4 @@ function getConnectionName(options) {
     return options && options.name ? options.name : typeorm_constants_1.DEFAULT_CONNECTION_NAME;
 }
 exports.getConnectionName = getConnectionName;
-exports.generateString = () => uuid();
+exports.generateString = () => uuid_1.v4();

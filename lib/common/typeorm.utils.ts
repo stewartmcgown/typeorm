@@ -9,7 +9,7 @@ import {
   Repository,
 } from 'typeorm';
 import { isNullOrUndefined } from 'util';
-import * as uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import { CircularDependencyException } from '../exceptions/circular-dependency.exception';
 import { DEFAULT_CONNECTION_NAME } from '../typeorm.constants';
 
@@ -113,12 +113,13 @@ export function handleRetry(
 ): <T>(source: Observable<T>) => Observable<T> {
   return <T>(source: Observable<T>) =>
     source.pipe(
-      retryWhen(e =>
+      retryWhen((e) =>
         e.pipe(
           scan((errorCount, error: Error) => {
             logger.error(
-              `Unable to connect to the database. Retrying (${errorCount +
-                1})...`,
+              `Unable to connect to the database. Retrying (${
+                errorCount + 1
+              })...`,
               error.stack,
             );
             if (errorCount + 1 >= retryAttempts) {
