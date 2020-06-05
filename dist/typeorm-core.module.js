@@ -22,6 +22,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 var TypeOrmCoreModule_1;
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.TypeOrmCoreModule = void 0;
 const common_1 = require("@nestjs/common");
 const core_1 = require("@nestjs/core");
 const rxjs_1 = require("rxjs");
@@ -147,6 +148,7 @@ let TypeOrmCoreModule = TypeOrmCoreModule_1 = class TypeOrmCoreModule {
                 }
             }
             catch (_a) { }
+            const connectionToken = typeorm_utils_1.getConnectionName(options);
             return yield rxjs_1.defer(() => {
                 if (!options.type) {
                     return typeorm_1.createConnection();
@@ -154,7 +156,6 @@ let TypeOrmCoreModule = TypeOrmCoreModule_1 = class TypeOrmCoreModule {
                 if (!options.autoLoadEntities) {
                     return typeorm_1.createConnection(options);
                 }
-                const connectionToken = options.name || typeorm_constants_1.DEFAULT_CONNECTION_NAME;
                 let entities = options.entities;
                 if (entities) {
                     entities = entities.concat(entities_metadata_storage_1.EntitiesMetadataStorage.getEntitiesByConnection(connectionToken));
@@ -164,7 +165,7 @@ let TypeOrmCoreModule = TypeOrmCoreModule_1 = class TypeOrmCoreModule {
                 }
                 return typeorm_1.createConnection(Object.assign(Object.assign({}, options), { entities }));
             })
-                .pipe(typeorm_utils_1.handleRetry(options.retryAttempts, options.retryDelay))
+                .pipe(typeorm_utils_1.handleRetry(options.retryAttempts, options.retryDelay, connectionToken, options.verboseRetryLog))
                 .toPromise();
         });
     }

@@ -37,7 +37,8 @@ export function getRepositoryToken(
       entity.options.target ? entity.options.target.name : entity.options.name
     }Repository`;
   }*/
-  return `${connectionPrefix}${entity.name}Repository`;
+  const name = 'options' in entity ? entity.options.name : entity.name;
+  return `${connectionPrefix}${name}Repository`;
 }
 
 /**

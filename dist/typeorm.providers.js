@@ -1,15 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const typeorm_1 = require("typeorm");
+exports.createTypeOrmProviders = void 0;
 const typeorm_utils_1 = require("./common/typeorm.utils");
 function createTypeOrmProviders(entities, connection) {
-    return (entities || []).map(entity => ({
+    return (entities || []).map((entity) => ({
         provide: typeorm_utils_1.getRepositoryToken(entity, connection),
         useFactory: (connection) => {
-            if (typeof typeorm_1.Repository === 'object' && (entity.prototype instanceof typeorm_1.Repository ||
-                entity.prototype instanceof typeorm_1.AbstractRepository)) {
-                return connection.getCustomRepository(entity);
-            }
             return connection.options.type === 'mongodb'
                 ? connection.getMongoRepository(entity)
                 : connection.getRepository(entity);

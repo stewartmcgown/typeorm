@@ -6,6 +6,7 @@ export declare type TypeOrmModuleOptions = {
   retryDelay?: number;
   autoLoadEntities?: boolean;
   keepConnectionAlive?: boolean;
+  verboseRetryLog?: boolean;
 } & Partial<ConnectionOptions>;
 export interface TypeOrmOptionsFactory {
   createTypeOrmOptions(

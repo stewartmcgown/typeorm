@@ -7,6 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 var TypeOrmModule_1;
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.TypeOrmModule = void 0;
 const common_1 = require("@nestjs/common");
 const entities_metadata_storage_1 = require("./entities-metadata.storage");
 const typeorm_core_module_1 = require("./typeorm-core.module");

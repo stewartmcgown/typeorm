@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.EntitiesMetadataStorage = void 0;
 class EntitiesMetadataStorage {
     static addEntitiesByConnection(connection, entities) {
         const connectionToken = typeof connection === 'string' ? connection : connection.name;
@@ -11,7 +12,7 @@ class EntitiesMetadataStorage {
             collection = [];
             this.storage.set(connectionToken, collection);
         }
-        entities.forEach(entity => {
+        entities.forEach((entity) => {
             if (collection.includes(entity)) {
                 return;
             }

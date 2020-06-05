@@ -184,7 +184,7 @@ export class TypeOrmCoreModule implements OnApplicationShutdown {
 
       let entities = options.entities;
       if (entities) {
-        entities = entities.concat(
+        entities = (entities as any).concat(
           EntitiesMetadataStorage.getEntitiesByConnection(connectionToken),
         );
       } else {

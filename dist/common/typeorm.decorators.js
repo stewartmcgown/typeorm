@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.InjectEntityManager = exports.InjectConnection = exports.InjectRepository = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_constants_1 = require("../typeorm.constants");
 const typeorm_utils_1 = require("./typeorm.utils");

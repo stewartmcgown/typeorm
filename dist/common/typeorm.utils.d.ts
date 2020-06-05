@@ -1,8 +1,9 @@
 import { Type } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { Connection, ConnectionOptions } from 'typeorm';
+import { EntityClassOrSchema } from '../interfaces/entity-class-or-schema.type';
 export declare function getRepositoryToken(
-  entity: Function,
+  entity: EntityClassOrSchema,
   connection?: Connection | ConnectionOptions | string,
 ): string;
 export declare function getCustomRepositoryToken(repository: Function): string;
@@ -18,6 +19,8 @@ export declare function getEntityManagerToken(
 export declare function handleRetry(
   retryAttempts?: number,
   retryDelay?: number,
+  connectionName?: string,
+  verboseRetryLog?: boolean,
 ): <T>(source: Observable<T>) => Observable<T>;
 export declare function getConnectionName(options: ConnectionOptions): string;
 export declare const generateString: () => string;

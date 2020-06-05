@@ -1,6 +1,7 @@
 import { Connection, ConnectionOptions } from 'typeorm';
+import { EntityClassOrSchema } from '../interfaces/entity-class-or-schema.type';
 export declare const InjectRepository: (
-  entity: Function,
+  entity: EntityClassOrSchema,
   connection?: string,
 ) => (target: object, key: string | symbol, index?: number | undefined) => void;
 export declare const InjectConnection: (

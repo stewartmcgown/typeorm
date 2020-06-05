@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.generateString = exports.getConnectionName = exports.handleRetry = exports.getEntityManagerToken = exports.getConnectionPrefix = exports.getConnectionToken = exports.getCustomRepositoryToken = exports.getRepositoryToken = void 0;
 const common_1 = require("@nestjs/common");
 const operators_1 = require("rxjs/operators");
 const typeorm_1 = require("typeorm");
@@ -13,7 +14,8 @@ function getRepositoryToken(entity, connection = typeorm_constants_1.DEFAULT_CON
         throw new circular_dependency_exception_1.CircularDependencyException('@InjectRepository()');
     }
     const connectionPrefix = getConnectionPrefix(connection);
-    return `${connectionPrefix}${entity.name}Repository`;
+    const name = 'options' in entity ? entity.options.name : entity.name;
+    return `${connectionPrefix}${name}Repository`;
 }
 exports.getRepositoryToken = getRepositoryToken;
 function getCustomRepositoryToken(repository) {
@@ -56,10 +58,15 @@ function getEntityManagerToken(connection = typeorm_constants_1.DEFAULT_CONNECTI
                 : `${connection.name}EntityManager`;
 }
 exports.getEntityManagerToken = getEntityManagerToken;
-function handleRetry(retryAttempts = 9, retryDelay = 3000) {
-    return (source) => source.pipe(operators_1.retryWhen(e => e.pipe(operators_1.scan((errorCount, error) => {
-        logger.error(`Unable to connect to the database. Retrying (${errorCount +
-            1})...`, error.stack);
+function handleRetry(retryAttempts = 9, retryDelay = 3000, connectionName = typeorm_constants_1.DEFAULT_CONNECTION_NAME, verboseRetryLog = false) {
+    return (source) => source.pipe(operators_1.retryWhen((e) => e.pipe(operators_1.scan((errorCount, error) => {
+        const connectionInfo = connectionName === typeorm_constants_1.DEFAULT_CONNECTION_NAME
+            ? ''
+            : ` (${connectionName})`;
+        const verboseMessage = verboseRetryLog
+            ? ` Message: ${error.message}.`
+            : '';
+        logger.error(`Unable to connect to the database${connectionInfo}.${verboseMessage} Retrying (${errorCount + 1})...`, error.stack);
         if (errorCount + 1 >= retryAttempts) {
             throw error;
         }
