@@ -6,9 +6,10 @@ import {
   Repository,
 } from 'typeorm';
 import { getConnectionToken, getRepositoryToken } from './common/typeorm.utils';
+import { EntityClassOrSchema } from './interfaces/entity-class-or-schema.type';
 
 export function createTypeOrmProviders(
-  entities?: Function[],
+  entities?: EntityClassOrSchema[],
   connection?: Connection | ConnectionOptions | string,
 ): Provider[] {
   return (entities || []).map((entity) => ({
@@ -16,6 +17,7 @@ export function createTypeOrmProviders(
     useFactory: (connection: Connection) => {
       if (
         typeof Repository === 'object' &&
+        entity instanceof Function &&
         (entity.prototype instanceof Repository ||
           entity.prototype instanceof AbstractRepository)
       ) {
