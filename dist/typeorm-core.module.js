@@ -165,7 +165,7 @@ let TypeOrmCoreModule = TypeOrmCoreModule_1 = class TypeOrmCoreModule {
                 }
                 return typeorm_1.createConnection(Object.assign(Object.assign({}, options), { entities }));
             })
-                .pipe(typeorm_utils_1.handleRetry(options.retryAttempts, options.retryDelay, connectionToken, options.verboseRetryLog))
+                .pipe(typeorm_utils_1.handleRetry(options.retryAttempts, options.retryDelay, connectionToken, options.verboseRetryLog, options.toRetry))
                 .toPromise();
         });
     }

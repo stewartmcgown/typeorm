@@ -1,7 +1,7 @@
 import { Logger, Type } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { delay, retryWhen, scan } from 'rxjs/operators';
-import { Connection, ConnectionOptions, EntityManager } from 'typeorm';
+import { Connection, ConnectionOptions, Repository } from 'typeorm';
 import { isNullOrUndefined } from 'util';
 import { v4 as uuid } from 'uuid';
 import { CircularDependencyException } from '../exceptions/circular-dependency.exception';
@@ -46,22 +46,24 @@ export function getRepositoryToken(
  * @param {Function} This parameter can either be an Entity or Repository
  * @returns {string} The Repository injection token
  */
-export function getCustomRepositoryToken(repository: Function) {
+export function getCustomRepositoryToken(repository: Repository<any>) {
   if (isNullOrUndefined(repository)) {
     throw new CircularDependencyException('@InjectRepository()');
   }
-  return repository.name;
+  return typeof repository.target === 'function'
+    ? repository.target.name
+    : repository.target;
 }
 
 /**
  * This function returns a Connection injection token for the given Connection, ConnectionOptions or connection name.
  * @param {Connection | ConnectionOptions | string} [connection='default'] This optional parameter is either
  * a Connection, or a ConnectionOptions or a string.
- * @returns {string | Function} The Connection injection token.
+ * @returns {string} The Connection injection token.
  */
 export function getConnectionToken(
   connection: Connection | ConnectionOptions | string = DEFAULT_CONNECTION_NAME,
-): string | Function | Type<Connection> {
+): string | Type<Connection> {
   return DEFAULT_CONNECTION_NAME === connection
     ? Connection
     : 'string' === typeof connection
@@ -96,17 +98,17 @@ export function getConnectionPrefix(
  * This function returns an EntityManager injection token for the given Connection, ConnectionOptions or connection name.
  * @param {Connection | ConnectionOptions | string} [connection='default'] This optional parameter is either
  * a Connection, or a ConnectionOptions or a string.
- * @returns {string | Function} The EntityManager injection token.
+ * @returns {string} The EntityManager injection token.
  */
 export function getEntityManagerToken(
   connection: Connection | ConnectionOptions | string = DEFAULT_CONNECTION_NAME,
-): string | Function {
+): string {
   return DEFAULT_CONNECTION_NAME === connection
-    ? EntityManager
+    ? 'EntityManager'
     : 'string' === typeof connection
     ? `${connection}EntityManager`
     : DEFAULT_CONNECTION_NAME === connection.name || !connection.name
-    ? EntityManager
+    ? 'EntityManager'
     : `${connection.name}EntityManager`;
 }
 
@@ -115,12 +117,16 @@ export function handleRetry(
   retryDelay = 3000,
   connectionName = DEFAULT_CONNECTION_NAME,
   verboseRetryLog = false,
+  toRetry?: (err: any) => boolean,
 ): <T>(source: Observable<T>) => Observable<T> {
   return <T>(source: Observable<T>) =>
     source.pipe(
       retryWhen((e) =>
         e.pipe(
           scan((errorCount, error: Error) => {
+            if (toRetry && !toRetry(error)) {
+              throw error;
+            }
             const connectionInfo =
               connectionName === DEFAULT_CONNECTION_NAME
                 ? ''

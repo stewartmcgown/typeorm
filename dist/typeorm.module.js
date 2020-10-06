@@ -10,6 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TypeOrmModule = void 0;
 const common_1 = require("@nestjs/common");
 const entities_metadata_storage_1 = require("./entities-metadata.storage");
+const get_custom_repository_entity_1 = require("./helpers/get-custom-repository-entity");
 const typeorm_core_module_1 = require("./typeorm-core.module");
 const typeorm_constants_1 = require("./typeorm.constants");
 const typeorm_providers_1 = require("./typeorm.providers");
@@ -22,7 +23,11 @@ let TypeOrmModule = TypeOrmModule_1 = class TypeOrmModule {
     }
     static forFeature(entities = [], connection = typeorm_constants_1.DEFAULT_CONNECTION_NAME) {
         const providers = typeorm_providers_1.createTypeOrmProviders(entities, connection);
-        entities_metadata_storage_1.EntitiesMetadataStorage.addEntitiesByConnection(connection, entities);
+        const customRepositoryEntities = get_custom_repository_entity_1.getCustomRepositoryEntity(entities);
+        entities_metadata_storage_1.EntitiesMetadataStorage.addEntitiesByConnection(connection, [
+            ...entities,
+            ...customRepositoryEntities,
+        ]);
         return {
             module: TypeOrmModule_1,
             providers: providers,

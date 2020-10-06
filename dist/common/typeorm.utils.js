@@ -22,7 +22,7 @@ function getCustomRepositoryToken(repository) {
     if (util_1.isNullOrUndefined(repository)) {
         throw new circular_dependency_exception_1.CircularDependencyException('@InjectRepository()');
     }
-    return repository.name;
+    return typeof repository.target === 'function' ? repository.target.name : repository.target;
 }
 exports.getCustomRepositoryToken = getCustomRepositoryToken;
 function getConnectionToken(connection = typeorm_constants_1.DEFAULT_CONNECTION_NAME) {
@@ -50,16 +50,19 @@ function getConnectionPrefix(connection = typeorm_constants_1.DEFAULT_CONNECTION
 exports.getConnectionPrefix = getConnectionPrefix;
 function getEntityManagerToken(connection = typeorm_constants_1.DEFAULT_CONNECTION_NAME) {
     return typeorm_constants_1.DEFAULT_CONNECTION_NAME === connection
-        ? typeorm_1.EntityManager
+        ? 'EntityManager'
         : 'string' === typeof connection
             ? `${connection}EntityManager`
             : typeorm_constants_1.DEFAULT_CONNECTION_NAME === connection.name || !connection.name
-                ? typeorm_1.EntityManager
+                ? 'EntityManager'
                 : `${connection.name}EntityManager`;
 }
 exports.getEntityManagerToken = getEntityManagerToken;
-function handleRetry(retryAttempts = 9, retryDelay = 3000, connectionName = typeorm_constants_1.DEFAULT_CONNECTION_NAME, verboseRetryLog = false) {
+function handleRetry(retryAttempts = 9, retryDelay = 3000, connectionName = typeorm_constants_1.DEFAULT_CONNECTION_NAME, verboseRetryLog = false, toRetry) {
     return (source) => source.pipe(operators_1.retryWhen((e) => e.pipe(operators_1.scan((errorCount, error) => {
+        if (toRetry && !toRetry(error)) {
+            throw error;
+        }
         const connectionInfo = connectionName === typeorm_constants_1.DEFAULT_CONNECTION_NAME
             ? ''
             : ` (${connectionName})`;
